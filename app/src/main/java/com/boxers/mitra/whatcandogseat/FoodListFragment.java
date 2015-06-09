@@ -1,14 +1,28 @@
 package com.boxers.mitra.whatcandogseat;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 
-import com.boxers.mitra.whatcandogseat.dummy.DummyContent;
+import com.boxers.mitra.whatcandogseat.foodlist.FoodContent;
+import com.boxers.mitra.whatcandogseat.foodlist.FoodItem;
+import com.boxers.mitra.whatcandogseat.foodlist.TypeOfFood;
+import com.opencsv.CSVReader;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A list fragment representing a list of Foods. This fragment
@@ -27,6 +41,11 @@ public class FoodListFragment extends ListFragment {
      */
     private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
+    private ListView mListView;
+
+    private static final String TAG = "FoodListFragment";
+
+    public static final int SYNC_INTERVAL = 30000 * 180;
     /**
      * The fragment's current callback object, which is notified of list item
      * clicks.
@@ -67,17 +86,31 @@ public class FoodListFragment extends ListFragment {
     public FoodListFragment() {
     }
 
+
+
+
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        // Get a reference to the ListView, and attach this adapter to it.
+        mListView = (ListView) rootView.findViewById(R.id.listview_forecast);
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
         // TODO: replace with a real list adapter.
-        setListAdapter(new ArrayAdapter<DummyContent.DummyItem>(
-                getActivity(),
-                android.R.layout.simple_list_item_activated_1,
-                android.R.id.text1,
-                DummyContent.ITEMS));
+//        setListAdapter(new ArrayAdapter<FoodItem>(
+//                getActivity(),
+//                R.layout.rowlayout,
+//                android.R.id.text1,
+//                FoodContent.ITEMS));
+
+       // setListAdapter(new FoodListAdapter(getActivity(),SYNC_INTERVAL,FoodContent.ITEMS_ARRAY));
+        if(FoodContent.getITEMS()==null) {
+            new FoodContent(getObjectFromAssetsFile(getActivity()));
+        }
+        setListAdapter(new FoodListAdapter(getActivity(),SYNC_INTERVAL,FoodContent.getITEMS().toArray(new FoodItem[0])));
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -117,7 +150,8 @@ public class FoodListFragment extends ListFragment {
 
         // Notify the active callbacks interface (the activity, if the
         // fragment is attached to one) that an item has been selected.
-        mCallbacks.onItemSelected(DummyContent.ITEMS.get(position).id);
+        //FoodContent.ITEMS=getObjectFromAssetsFile(view.getContext());
+        mCallbacks.onItemSelected(FoodContent.getITEMS().get(position).getId());
     }
 
     @Override
@@ -149,5 +183,52 @@ public class FoodListFragment extends ListFragment {
         }
 
         mActivatedPosition = position;
+    }
+
+    private static List<FoodItem> getObjectFromAssetsFile(Context context) {
+
+        List<FoodItem> listOfFoodItems=new ArrayList<>();
+        try {
+
+            AssetManager assets = context.getAssets();
+            InputStream csvStream = assets.open("Dogs - Sheet1.csv");
+            InputStreamReader csvStreamReader = new InputStreamReader(csvStream);
+
+            CSVReader csvReader = new CSVReader(csvStreamReader);
+
+            String[] line;
+
+            // throw away the header
+            csvReader.readNext();
+
+            int i=1;
+
+            while ((line = csvReader.readNext()) != null) {
+
+                i++;
+                TypeOfFood typeOfFood=TypeOfFood.BAD;
+                if(line[2].equalsIgnoreCase("GOOD"))
+                {
+                    typeOfFood=TypeOfFood.GOOD;
+                }else if(line[2].equalsIgnoreCase("BAD"))
+                {
+                    typeOfFood=TypeOfFood.BAD;
+
+                }
+                else if(line[2].equalsIgnoreCase("NEUTRAL"))
+                {
+                    typeOfFood=TypeOfFood.NEUTRAL;
+
+                }
+                listOfFoodItems.add(new FoodItem(String.valueOf(i),typeOfFood,line[0],line[1]));
+            }
+
+        } catch (FileNotFoundException e) {
+            Log.e(TAG,"Expected file was not found",e);
+        }catch (Exception e) {// Catch exception if any
+            Log.e(TAG,"An exception occured while rendering fragment",e);
+
+        }
+        return listOfFoodItems;
     }
 }
