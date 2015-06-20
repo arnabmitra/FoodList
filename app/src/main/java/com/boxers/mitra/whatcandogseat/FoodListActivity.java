@@ -1,10 +1,14 @@
 package com.boxers.mitra.whatcandogseat;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.SearchView;
 
 
 /**
@@ -44,11 +48,20 @@ public class FoodListActivity extends ActionBarActivity
             // activity should be in two-pane mode.
             mTwoPane = true;
 
-            // In two-pane mode, list items should be given the
-            // 'activated' state when touched.
-            ((FoodListFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.food_list))
-                    .setActivateOnItemClick(true);
+            if (savedInstanceState == null) {
+                // Create the detail fragment and add it to the activity
+                // using a fragment transaction.
+                Bundle arguments = new Bundle();
+                arguments.putString(FoodListFragment.SEARCH_QUERY,
+                        getIntent().getStringExtra(FoodListFragment.SEARCH_QUERY));
+                FoodListFragment fragment = new FoodListFragment();
+                fragment.setArguments(arguments);
+                // In two-pane mode, list items should be given the
+                // 'activated' state when touched.
+                ((FoodListFragment) getSupportFragmentManager()
+                        .findFragmentById(R.id.food_list))
+                        .setActivateOnItemClick(true);
+            }
         }
 
         // TODO: If exposing deep links into your app, handle intents here.
@@ -85,7 +98,16 @@ public class FoodListActivity extends ActionBarActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo( searchManager.getSearchableInfo(getComponentName()) );
+
         return true;
     }
-    
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
 }

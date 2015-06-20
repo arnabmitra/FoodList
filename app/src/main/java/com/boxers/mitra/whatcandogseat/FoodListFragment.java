@@ -2,6 +2,7 @@ package com.boxers.mitra.whatcandogseat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.v4.app.ListFragment;
@@ -45,6 +46,11 @@ public class FoodListFragment extends ListFragment {
 
     private static final String TAG = "FoodListFragment";
 
+    public static final String SEARCH_QUERY = "search";
+
+    private  String mSearchQuery;
+
+
     public static final int SYNC_INTERVAL = 30000 * 180;
     /**
      * The fragment's current callback object, which is notified of list item
@@ -69,6 +75,7 @@ public class FoodListFragment extends ListFragment {
         public void onItemSelected(String id);
     }
 
+
     /**
      * A dummy implementation of the {@link Callbacks} interface that does
      * nothing. Used only when this fragment is not attached to an activity.
@@ -86,6 +93,12 @@ public class FoodListFragment extends ListFragment {
     public FoodListFragment() {
     }
 
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+    }
 
 
 
@@ -106,10 +119,28 @@ public class FoodListFragment extends ListFragment {
 //                FoodContent.ITEMS));
 
        // setListAdapter(new FoodListAdapter(getActivity(),SYNC_INTERVAL,FoodContent.ITEMS_ARRAY));
+        Intent intent = getActivity().getIntent();
+        String mSearchQuery= intent.getStringExtra(SEARCH_QUERY);
+
         if(FoodContent.getITEMS()==null) {
             new FoodContent(getObjectFromAssetsFile(getActivity()));
         }
-        setListAdapter(new FoodListAdapter(getActivity(),SYNC_INTERVAL,FoodContent.getITEMS().toArray(new FoodItem[0])));
+        List<FoodItem> items=new ArrayList<>();
+        if(mSearchQuery!=null && !mSearchQuery.isEmpty())
+        {
+            for(FoodItem item:FoodContent.getITEMS())
+            {
+                if(item.getItemName().toLowerCase().contains(mSearchQuery))
+                {
+                    items.add(item);
+                }
+            }
+        }
+        else
+        {
+            items=FoodContent.getITEMS();
+        }
+        setListAdapter(new FoodListAdapter(getActivity(),SYNC_INTERVAL,items.toArray(new FoodItem[0])));
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
