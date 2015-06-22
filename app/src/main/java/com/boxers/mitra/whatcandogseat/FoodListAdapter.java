@@ -2,6 +2,7 @@ package com.boxers.mitra.whatcandogseat;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 
 import com.boxers.mitra.whatcandogseat.foodlist.FoodItem;
 import com.boxers.mitra.whatcandogseat.foodlist.TypeOfFood;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by arnabmitra on 6/7/15.
@@ -36,7 +39,12 @@ public class FoodListAdapter extends ArrayAdapter<FoodItem> {
         // reuse views
         if (rowView == null) {
             LayoutInflater inflater = context.getLayoutInflater();
-            rowView = inflater.inflate(R.layout.rowlayout, null);
+            try {
+                rowView = inflater.inflate(R.layout.rowlayout, null);
+            }catch(Exception e)
+            {
+                Log.e("EXCEPTION",e.getCause().toString(),e);
+            }
             // configure view holder
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.text = (TextView) rowView.findViewById(R.id.food_text);
