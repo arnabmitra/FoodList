@@ -19,10 +19,13 @@ import com.boxers.mitra.whatcandogseat.foodlist.FoodItem;
 import com.boxers.mitra.whatcandogseat.foodlist.TypeOfFood;
 import com.opencsv.CSVReader;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -251,7 +254,7 @@ public class FoodListFragment extends ListFragment {
                     typeOfFood=TypeOfFood.NEUTRAL;
 
                 }
-                listOfFoodItems.add(new FoodItem(String.valueOf(i),typeOfFood,line[0],line[1]));
+                listOfFoodItems.add(new FoodItem(String.valueOf(i),typeOfFood,line[0],line[0]+":"+ StringUtils.capitalize(line[1])));
             }
 
         } catch (FileNotFoundException e) {
@@ -260,6 +263,7 @@ public class FoodListFragment extends ListFragment {
             Log.e(TAG,"An exception occured while rendering fragment",e);
 
         }
+        Collections.sort(listOfFoodItems);
         return listOfFoodItems;
     }
 }

@@ -10,12 +10,13 @@
         <activity
             android:name=".FoodListActivity"
             android:label="@string/app_name"
-            android:theme="@style/ForecastTheme">
+            android:theme="@style/ForecastTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".SearchResultsActivity" />
@@ -28,17 +29,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".FoodListActivity" />
         </activity>
-
-        <activity android:name=".SearchResultsActivity"
+        <activity
+            android:name=".SearchResultsActivity"
             android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-            <meta-data android:name="android.app.searchable"
-                android:resource="@xml/searchable"/>
-        </activity>
 
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+        <activity
+            android:name=".DisclaimerActivity"
+            android:label="@string/title_activity_disclaimer"
+            android:parentActivityName=".FoodListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.boxers.mitra.whatcandogseat.FoodListActivity" />
+        </activity>
     </application>
 
 </manifest>

@@ -3,7 +3,7 @@ package com.boxers.mitra.whatcandogseat.foodlist;
 /**
  * Created by arnabmitra on 6/7/15.
  */
-public class FoodItem {
+public class FoodItem implements Comparable<FoodItem>{
 
     private String id;
 
@@ -55,4 +55,9 @@ public class FoodItem {
     }
 
 
+    @Override
+    public int compareTo(FoodItem other) {
+        int last = this.itemName.toLowerCase().compareTo(other.itemName.toLowerCase());
+        return last == 0 ? this.typeOfFood.compareTo(other.typeOfFood) : last;
+    }
 }
